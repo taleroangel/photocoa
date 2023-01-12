@@ -48,16 +48,18 @@ class PictureSave extends StatelessWidget {
                       final navigator = Navigator.of(context);
                       final path =
                           (await getApplicationDocumentsDirectory()).path;
+                      final filePath = "$path/${basename(file.path)}";
                       file
-                          .copy(path + basename(file.path))
-                          .then((value) =>
-                              AlertTools.infoSnackbar(context, "Image saved"))
+                          .copy(filePath)
+                          .then((value) => AlertTools.infoSnackbar(
+                              context, "Image saved as: $filePath"))
                           .onError((error, stackTrace) {
                         AlertTools.errorSnackbar(
                             context, "Image storage failed\n$error");
                         log(error.toString(),
                             level: DiagnosticLevel.error.index);
                       });
+
                       file.delete();
                       navigator.pop();
                     },

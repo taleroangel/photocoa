@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:photocoa/providers/camera_hardware_provider.dart';
 import 'package:photocoa/screens/camera_screen.dart';
+import 'package:photocoa/screens/gallery.dart';
 import 'package:photocoa/screens/settings.dart';
 import 'package:photocoa/widgets/preview_widget.dart';
 import 'package:provider/provider.dart';
@@ -81,31 +82,35 @@ class HomeScreen extends StatelessWidget {
               //* Gallery Button
               Expanded(
                 flex: 3,
-                child: Container(
-                  color: Theme.of(context).colorScheme.primary,
-                  child: Stack(children: [
-                    // Text
-                    Positioned(
-                      bottom: 0,
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          "Gallery",
-                          style: TextStyle(color: Colors.white, fontSize: 25),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                        right: 0,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => const Gallery())),
+                  child: Container(
+                    color: Theme.of(context).colorScheme.primary,
+                    child: Stack(children: [
+                      // Text
+                      Positioned(
                         bottom: 0,
                         child: Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Icon(
-                            Icons.photo_album,
-                            color: Colors.white,
+                          child: Text(
+                            "Gallery",
+                            style: TextStyle(color: Colors.white, fontSize: 25),
                           ),
-                        ))
-                  ]),
+                        ),
+                      ),
+                      Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Icon(
+                              Icons.photo_album,
+                              color: Colors.white,
+                            ),
+                          ))
+                    ]),
+                  ),
                 ),
               ),
 
