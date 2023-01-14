@@ -52,7 +52,7 @@ class PictureSave extends StatelessWidget {
                       file
                           .copy(filePath)
                           .then((value) => AlertTools.infoSnackbar(
-                              context, "Image saved as: $filePath"))
+                              context, "Image successfully saved "))
                           .onError((error, stackTrace) {
                         AlertTools.errorSnackbar(
                             context, "Image storage failed\n$error");

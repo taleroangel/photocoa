@@ -12,8 +12,7 @@ void main() async {
   // Set orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Dependency injection
-  GetIt.I.registerSingleton<AudioPlayer>(
-      AudioPlayer()..setSourceAsset('sound/shutter_click.mp3'));
+  GetIt.I.registerSingleton<AudioPlayer>(AudioPlayer());
   // Run application
   runApp(const Application());
 }

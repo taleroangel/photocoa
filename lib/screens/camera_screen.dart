@@ -8,6 +8,9 @@ import 'package:photocoa/tools/alert_tools.dart';
 import 'package:photocoa/widgets/preview_widget.dart';
 import 'package:provider/provider.dart';
 
+//TODO: Allow zooming
+//TODO: Show processing message
+//TODO: Second sound
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 

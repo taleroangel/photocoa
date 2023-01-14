@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:photocoa/screens/picture_detail.dart';
 
 class Gallery extends StatelessWidget {
   const Gallery({super.key});
@@ -37,16 +38,19 @@ class _GalleryBuilder extends StatefulWidget {
 }
 
 class _GalleryBuilderState extends State<_GalleryBuilder> {
+  bool doneReading = false;
   Set<File> files = {};
 
   @override
   void initState() {
     super.initState();
-    widget.fileStream.listen((event) {
-      setState(() {
-        files.add(event);
-      });
-    });
+    widget.fileStream
+        .listen((event) => setState(() {
+              files.add(event);
+            }))
+        .onDone(() => setState(() {
+              doneReading = true;
+            }));
   }
 
   @override
@@ -57,12 +61,16 @@ class _GalleryBuilderState extends State<_GalleryBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      mainAxisSpacing: 5.0,
-      crossAxisSpacing: 5.0,
-      crossAxisCount: 3,
-      children: files.map((e) => _GalleryItemAdapter(e)).toList(),
-    );
+    return (files.isEmpty)
+        ? (doneReading // If done reading
+            ? const Text("Looks like you haven't taken any pictures yet")
+            : const CircularProgressIndicator())
+        : GridView.count(
+            mainAxisSpacing: 5.0,
+            crossAxisSpacing: 5.0,
+            crossAxisCount: 3,
+            children: files.map((e) => _GalleryItemAdapter(e)).toList(),
+          );
   }
 }
 
@@ -72,12 +80,20 @@ class _GalleryItemAdapter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          image: DecorationImage(
-        fit: BoxFit.cover,
-        image: FileImage(file),
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => PictureDetail(file),
       )),
+      child: Hero(
+        tag: 'picture::${file.path}',
+        child: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            fit: BoxFit.cover,
+            image: FileImage(file),
+          )),
+        ),
+      ),
     );
   }
 }
