@@ -8,7 +8,6 @@ import 'package:photocoa/tools/alert_tools.dart';
 import 'package:photocoa/widgets/preview_widget.dart';
 import 'package:provider/provider.dart';
 
-//TODO: Allow zooming
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 
@@ -17,6 +16,7 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
+  double zoomLevel = 1.0;
   bool _busy = false;
 
   @override
@@ -27,35 +27,72 @@ class _CameraScreenState extends State<CameraScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutBuilder(
-          builder: (_, constraints) => Hero(
-                tag: "main::camera",
-                child: Stack(children: [
-                  Preview(
-                      width: constraints.maxWidth,
-                      height: constraints.maxHeight),
-                  if (_busy)
-                    Container(
-                      width: constraints.maxWidth,
-                      height: constraints.maxHeight,
-                      color: Colors.black38,
-                    ),
-                  if (_busy)
-                    const Positioned(
-                      bottom: 20,
-                      right: 20,
-                      child: CircularProgressIndicator(),
-                    ),
-                  if (_busy)
-                    Positioned(
-                      bottom: 20,
-                      left: 20,
-                      child: Text(
-                        "Processing photo\nThis may take a while",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary),
+          builder: (_, constraints) => GestureDetector(
+                onScaleUpdate: (details) {
+                  setState(() {
+                    // Update ZOOM values
+                    if (details.scale > 1.0) {
+                      zoomLevel += 0.01;
+                    } else if (details.scale < 1.0) {
+                      zoomLevel -= 0.01;
+                    }
+
+                    // Keep ZOOM between boundaries
+                    if (zoomLevel > 4.0) {
+                      zoomLevel = 4.0;
+                    }
+                    if (zoomLevel < 1.0) {
+                      zoomLevel = 1.0;
+                    }
+
+                    // Set ZOOM levels
+                    cameraController.currentController!.setZoomLevel(zoomLevel);
+                  });
+                },
+                child: Hero(
+                  tag: "main::camera",
+                  child: Stack(children: [
+                    Preview(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight),
+                    if (_busy)
+                      Container(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                        color: Colors.black38,
                       ),
-                    )
-                ]),
+                    if (_busy)
+                      const Positioned(
+                        bottom: 20,
+                        right: 20,
+                        child: CircularProgressIndicator(),
+                      ),
+                    if (_busy)
+                      Positioned(
+                        bottom: 20,
+                        left: 20,
+                        child: Text(
+                          "Processing photo\nThis may take a while",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary),
+                        ),
+                      ),
+                    if (zoomLevel != 1.0)
+                      Positioned(
+                          left: 10,
+                          bottom: 10,
+                          child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black12),
+                              onPressed: () => setState(() {
+                                    zoomLevel = 1.0;
+                                    cameraController.currentController!
+                                        .setZoomLevel(zoomLevel);
+                                  }),
+                              icon: const Icon(Icons.zoom_in),
+                              label: Text(zoomLevel.toStringAsFixed(2))))
+                  ]),
+                ),
               )),
       persistentFooterAlignment: AlignmentDirectional.topStart,
       persistentFooterButtons: [
