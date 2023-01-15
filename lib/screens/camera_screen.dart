@@ -9,8 +9,6 @@ import 'package:photocoa/widgets/preview_widget.dart';
 import 'package:provider/provider.dart';
 
 //TODO: Allow zooming
-//TODO: Show processing message
-//TODO: Second sound
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 
@@ -46,6 +44,16 @@ class _CameraScreenState extends State<CameraScreen> {
                       bottom: 20,
                       right: 20,
                       child: CircularProgressIndicator(),
+                    ),
+                  if (_busy)
+                    Positioned(
+                      bottom: 20,
+                      left: 20,
+                      child: Text(
+                        "Processing photo\nThis may take a while",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
                     )
                 ]),
               )),
@@ -89,18 +97,25 @@ class _CameraScreenState extends State<CameraScreen> {
 
                   // Attempt photo
                   try {
+                    // Play shutter click
+                    GetIt.I
+                        .get<AudioPlayer>()
+                        .play(AssetSource('sound/shutter_click.mp3'));
+
                     setState(() {
                       _busy = true;
                     });
 
+                    // Store navigator
                     final navigator = Navigator.of(context);
 
-                    // Get the file
+                    // Get the file and process it
                     final file = await cameraController.takePicture();
-                    // Reproduce sound
-                    await GetIt.I
+
+                    // Reproduce success sound
+                    GetIt.I
                         .get<AudioPlayer>()
-                        .play(AssetSource('sound/shutter_click.mp3'));
+                        .play(AssetSource('sound/shutter_success.mp3'));
 
                     setState(() {
                       _busy = false;

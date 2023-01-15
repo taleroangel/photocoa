@@ -16,7 +16,6 @@ dependencies:
   get_it: ^7.2.0
   provider: ^6.0.5
   audioplayers: ^2.0.0
-  image: ^4.0.8
   path_provider: ^2.0.11
   path: ^1.8.2
   native_exif: ^0.4.0
@@ -24,6 +23,10 @@ dependencies:
   numberpicker: ^2.1.1
   package_info: ^2.0.2
   global_configs: ^1.1.2
+  url_launcher: ^6.1.7
+  flutter_native_splash: ^2.2.16
+  image: ^3.3.0
+  flutter_launcher_icons: ^0.11.0
 
 dev_dependencies:
   flutter_test:
@@ -35,5 +38,16 @@ flutter:
   uses-material-design: true
 
   assets:
-    - "assets/sound/shutter_click.mp3"
+    - "assets/sound/"
+    - "assets/icons/"
     - "assets/config/settings.json"
+
+flutter_native_splash:
+  color: "#ff5722"
+  image: "assets/icons/cocoa_icon.png"
+
+flutter_icons:
+  android: true
+  image_path: "assets/icons/cocoa_icon.png"
+  background_color: "#ff5722"
+  icon_size: 48

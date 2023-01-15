@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +9,13 @@ import 'package:photocoa/tools/datetime_tools.dart';
 class PictureDetail extends StatelessWidget {
   final File file;
   const PictureDetail(this.file, {super.key});
+
+  Future<DateTime> getImageDate() async {
+    final exifData = await Exif.fromPath(file.path);
+    final datetime = DateFormat('yyyy:MM:dd HH:mm:ss')
+        .parse(await exifData.getAttribute('DateTime'));
+    return datetime;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,12 +99,28 @@ class PictureDetail extends StatelessWidget {
       ),
       body: Center(
         heightFactor: 1.0,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: InteractiveViewer(
-            clipBehavior: Clip.none,
-            child: Hero(tag: 'picture::${file.path}', child: Image.file(file)),
-          ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: InteractiveViewer(
+                clipBehavior: Clip.none,
+                child:
+                    Hero(tag: 'picture::${file.path}', child: Image.file(file)),
+              ),
+            ),
+            FutureBuilder(
+                future: getImageDate(),
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Text(
+                      "${DateFormat('MMM d, y HH:mm').format(snapshot.data!)}\n(${DateTimeTools.daysSinceDate(snapshot.data!)} days ago)",
+                      textAlign: TextAlign.center,
+                    );
+                  }
+                  return const LinearProgressIndicator();
+                })
+          ],
         ),
       ),
     );

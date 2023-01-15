@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:global_configs/global_configs.dart';
 import 'package:intl/intl.dart';
@@ -17,12 +18,14 @@ import 'package:provider/provider.dart';
 
 void main() async {
   // Flutter initialization
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   // Set orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Dependency injection
   GetIt.I.registerSingleton<AudioPlayer>(AudioPlayer());
   // Run application
+  FlutterNativeSplash.remove();
   runApp(const Application());
 }
 
