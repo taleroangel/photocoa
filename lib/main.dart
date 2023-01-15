@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
-import 'package:global_configs/global_configs.dart';
 import 'package:intl/intl.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:path/path.dart';
@@ -15,6 +13,7 @@ import 'package:photocoa/providers/camera_hardware_provider.dart';
 import 'package:photocoa/screens/home_screen.dart';
 import 'package:photocoa/tools/datetime_tools.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   // Flutter initialization
@@ -24,6 +23,8 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Dependency injection
   GetIt.I.registerSingleton<AudioPlayer>(AudioPlayer());
+  GetIt.I.registerSingletonAsync<SharedPreferences>(
+      () => SharedPreferences.getInstance());
   // Run application
   FlutterNativeSplash.remove();
   runApp(const Application());
@@ -31,28 +32,23 @@ void main() async {
 
 Future<void> initialize() async {
   // Load settings
-  GlobalConfigs().loadJsonFromdir('assets/config/settings.json');
-  // Create settings file
-  final settingsPath =
-      '${(await getApplicationSupportDirectory()).path}/settings.json';
-  final settingsFile = File(settingsPath);
+  await GetIt.I.allReady();
 
-  try {
-    // Create settings file if missing
-    if (!await settingsFile.exists()) {
-      await settingsFile.create();
-      final json = jsonEncode(GlobalConfigs().configs);
-      await settingsFile.writeAsString(json);
-    }
+  final preferences = GetIt.I.get<SharedPreferences>();
+  var deleteDays = preferences.getInt('delete_days');
+  var deleteAuto = preferences.getBool('delete_auto');
 
-    final settingsJson = jsonDecode(await settingsFile.readAsString());
-
-    for (var element in settingsJson.entries) {
-      GlobalConfigs().set(element.key, element.value);
-    }
-  } catch (_) {
-    settingsFile.delete();
+  if (deleteDays == null) {
+    preferences.setInt('delete_days', 1);
+    deleteDays = 1;
   }
+
+  if (deleteAuto == null) {
+    preferences.setBool('delete_auto', true);
+    deleteAuto = true;
+  }
+
+  if (!deleteAuto) return; // No auto delete, then exit
 
   // Erase photos
   final filesPath = await getApplicationDocumentsDirectory();
@@ -60,8 +56,6 @@ Future<void> initialize() async {
       .listSync()
       .where((event) => (extension(event.path) == '.jpg'))
       .map((event) => File(event.path));
-
-  final deleteDays = GlobalConfigs().get('delete_days');
 
   for (var file in allfiles) {
     // Get image date
@@ -76,8 +70,6 @@ Future<void> initialize() async {
       await file.delete();
     }
   }
-
-  return Future.value();
 }
 
 class Application extends StatelessWidget {

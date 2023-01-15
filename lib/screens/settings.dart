@@ -1,13 +1,10 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:global_configs/global_configs.dart';
+import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:photocoa/tools/alert_tools.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatefulWidget {
@@ -18,34 +15,17 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  late final SharedPreferences settings;
   final future = PackageInfo.fromPlatform();
-  var automaticDelete = false;
+  var deleteAuto = false;
   var deleteDays = 1;
 
   @override
   void initState() {
-    automaticDelete = GlobalConfigs().get('delete_auto');
-    deleteDays = GlobalConfigs().get('delete_days');
+    settings = GetIt.I.get<SharedPreferences>();
+    deleteAuto = settings.getBool('delete_auto')!;
+    deleteDays = settings.getInt('delete_days')!;
     super.initState();
-  }
-
-  Future<void> saveSettings() async {
-    GlobalConfigs().set<bool>('delete_auto', automaticDelete);
-    GlobalConfigs().set<int>('delete_days', deleteDays);
-
-    // Create settings file
-    final settingsPath =
-        '${(await getApplicationSupportDirectory()).path}/settings.json';
-    final settingsFile = File(settingsPath);
-
-    // Create settings file if missing
-    if (await settingsFile.exists()) {
-      await settingsFile.delete();
-      await settingsFile.create();
-      await settingsFile.writeAsString(jsonEncode(GlobalConfigs().configs));
-    }
-
-    return Future.value();
   }
 
   void launchGithub() {
@@ -95,7 +75,7 @@ class _SettingsState extends State<Settings> {
                               width: 50),
                           applicationName: (await future).appName,
                           applicationLegalese:
-                              "Powered by Flutter 🐦️\nCopyright © Ángel Talero 2022 - ${DateTime.now().year}",
+                              "Powered by Flutter 🐦️\nCopyright © Ángel Talero ${DateTime.now().year}",
                           applicationVersion: (await future).version,
                           children: <Widget>[
                             const Divider(),
@@ -137,15 +117,14 @@ class _SettingsState extends State<Settings> {
                       ]))),
                   Switch(
                     activeColor: Theme.of(context).colorScheme.primary,
-                    value: automaticDelete,
-                    onChanged: (value) =>
-                        setState(() => (automaticDelete = value)),
+                    value: deleteAuto,
+                    onChanged: (value) => setState(() => (deleteAuto = value)),
                   )
                 ],
               ),
 
               // Time deletion selector
-              if (automaticDelete)
+              if (deleteAuto)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -179,7 +158,11 @@ class _SettingsState extends State<Settings> {
               const Divider(),
               ElevatedButton.icon(
                 onPressed: () {
-                  saveSettings().then((_) {
+                  (() async {
+                    await settings.setBool('delete_auto', deleteAuto);
+                    await settings.setInt('delete_days', deleteDays);
+                  })()
+                      .then((_) {
                     AlertTools.infoSnackbar(
                         context, "Settings were saved successfully");
                   }).onError((error, stackTrace) {
