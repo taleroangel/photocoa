@@ -44,9 +44,11 @@ flutter:
 flutter_native_splash:
   color: "#ff5722"
   image: "assets/icons/cocoa_icon.png"
+  image_dark: "assets/icons/cocoa_icon.png"
 
 flutter_icons:
   android: true
   image_path: "assets/icons/cocoa_icon.png"
   background_color: "#ff5722"
-  icon_size: 48
+  adaptive_icon_foreground: "assets/icons/cocoa_icon_padding.png"
+  adaptive_icon_background: "#ff5722"

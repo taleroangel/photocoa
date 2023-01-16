@@ -6,6 +6,9 @@ class DateTimeTools {
       DateFormat('yyyy:MM:dd HH:mm:ss')
           .parse(await exif.getAttribute('DateTime'));
 
+  static String toExif(DateTime dateTime) =>
+      DateFormat('yyyy:MM:dd HH:mm:ss').format(dateTime);
+
   static int daysSinceDate(DateTime time) {
     final duration = DateTime.now().difference(time);
     return duration.inDays;

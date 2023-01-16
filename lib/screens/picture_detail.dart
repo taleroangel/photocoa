@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -100,6 +101,7 @@ class PictureDetail extends StatelessWidget {
       body: Center(
         heightFactor: 1.0,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.all(18.0),
@@ -112,7 +114,8 @@ class PictureDetail extends StatelessWidget {
             FutureBuilder(
                 future: getImageDate(),
                 builder: (_, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
                     return Text(
                       "${DateFormat('MMM d, y HH:mm').format(snapshot.data!)}\n(${DateTimeTools.daysSinceDate(snapshot.data!)} days ago)",
                       textAlign: TextAlign.center,

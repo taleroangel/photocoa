@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
 import 'package:image/image.dart' as image;
+import 'package:native_exif/native_exif.dart';
+import 'package:photocoa/tools/datetime_tools.dart';
 
 enum CameraType { rear, front }
 
@@ -145,14 +146,20 @@ class CameraHardwareProvider extends ChangeNotifier {
     final xfile = await currentController!.takePicture();
 
     // File processing
-    final processed = (cameraType == CameraType.front)
+    var processed = (cameraType == CameraType.front)
         ? (image.flipHorizontal(image.decodeImage(await xfile.readAsBytes())!))
         : image.decodeImage(await xfile.readAsBytes())!;
 
     // File (dart:io)
-    final file =
-        await File(xfile.path).writeAsBytes(image.encodeJpg(processed));
+    var file = await File(xfile.path).writeAsBytes(image.encodeJpg(processed));
 
+    // Embed DateTime
+    final exif = await Exif.fromPath(xfile.path);
+    if (processed.width > processed.height) {
+      await exif.writeAttribute('Orientation', '6');
+    }
+    await exif.writeAttribute('DateTime', DateTimeTools.toExif(DateTime.now()));
+    await exif.close();
     return file;
   }
 }
