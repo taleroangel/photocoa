@@ -1,14 +1,16 @@
 # photocoa 🍫
-![](/assets/icons/cocoa_icon.png)
+![](/docs/icons/cocoa_sm.png)
 
-_Temporary photos app:_ Take pictures without Google Photos syncing them and automatically delete them.
+A temporary private photos app that allows you to take pictures and delete them automatically without syncing them to Google Photos.
+
+<a href="#"><img width="200px" src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-black.png"/></a>
 
 |||
 |-|-|
-|![](/docs/menu.png)|![](/docs/settings.png)|
-|![](/docs/picture.png)|![](docs/camera.png)|
+|![](/docs/screenshots/16_9/menu.jpg)|![](/docs/screenshots/16_9/settings.jpg)|
+|![](/docs/screenshots/16_9/picture.jpg)|![](docs/screenshots/16_9/camera.jpg)|
 
-## Compilation
+## 🏗️ Compilation
 The project is only available in 'Android' though no specific Android libraries where used ('camera' package is managing the Platform specific camera details) so it may work in other OS but I have no way of testing it.
 
 __'flutter_native_splash'__ and __'flutter_launcher_icons'__ require building before running the application, use the following commands:
