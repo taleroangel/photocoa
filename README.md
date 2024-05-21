@@ -1,7 +1,7 @@
 # photocoa 🍫
 ![](/docs/icons/cocoa_sm.png)
 
-A temporary private photos app that allows you to take pictures and delete them automatically without syncing them to Google Photos.
+A temporary private photos app built in Flutter that allows you to take pictures and delete them automatically without syncing them to cloud providers ensuring privacy.
 
 <a href="#"><img width="200px" src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-black.png"/></a>
 
